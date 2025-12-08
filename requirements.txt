@@ -1,0 +1,11 @@
+python-dotenv
+requests
+numpy
+pandas
+plotly
+glom
+streamlit
+folium
+pillow
+streamlit-folium
+gunicorn
