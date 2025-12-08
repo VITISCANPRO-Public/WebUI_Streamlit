@@ -1,0 +1,26 @@
+name: vitiscan_streamlit
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - python-dotenv
+  - requests
+  - numpy
+  - pandas
+  - plotly
+  - ipykernel # ne pas installer jupyterlab qui est dans l'env base
+  - notebook
+  - nbformat # pour notebook
+  - glom
+  - conda-bash-completion
+  - streamlit
+  - folium
+  - pillow
+  - streamlit-folium
+  #- geopy
+  #- boto3
+  #- s3fs
+  #- pip:
+  #  - -r file:env_streamlit_requirements.txt
