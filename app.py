@@ -35,12 +35,12 @@ def get_exif_data(image):
 def call_mock_api_diagnostic(image):
     """Appel API pour obtenir un diagnostic."""
     files = {"file": image}
-    response = requests.post(f"{API_DIAGNO}/diagnostic", files=files)
+    response = requests.post(f"{API_DIAGNO}/diagno", files=files, verify=False)
     return response.json()
 
 def call_mock_api_treatment(disease):
     """Appel API pour obtenir les traitements."""
-    response = requests.post(f"{API_SOLUTIONS}/treatment", json={"disease": disease})
+    response = requests.post(f"{API_SOLUTIONS}/treatment", json={"disease": disease}, verify=False)
     return response.json()
 
 def main():
@@ -50,15 +50,15 @@ def main():
 
     with col1:
         st.subheader("Diagnostic Foliaire & Actions")
-        uploaded_file = st.file_uploader("Télchargez une photo de feuille de vigne", type=["jpg", "png"])
+        uploaded_file = st.file_uploader("Télchargez une photo de feuille de vigne", type=["jpg", "png","jpeg"])
 
         if uploaded_file:
             st.image(uploaded_file, caption="Feuille téléchargée", width=300)
 
             # Appel à l'API pour le diagnostic
             # A DECOMMENTER lorsque API diagno opérationnelle
-            #diagnostic = call_mock_api_diagnostic(uploaded_file)
-            diagnostic = [{'disease':'mildiou', 'probability':0.96 }]
+            diagnostic = call_mock_api_diagnostic(uploaded_file)
+            #diagnostic = [{'disease':'mildiou', 'probability':0.96 }]
             st.write("### Maladies détectées :")
             for disease in diagnostic:
                 if st.button(disease["disease"]):
