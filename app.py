@@ -38,13 +38,17 @@ def get_exif_data(image):
 
 def call_mock_api_diagnostic(image):
     """Appel API pour obtenir un diagnostic."""
-    files = {"file": image}
     if MOCK == 1:
         diagnostic = [{'disease':'Mildiou', 'confidence':0.96 }, {'disease':'Anthracnose', 'confidence':0.75 }]
         return diagnostic
     else:
+        files = {"file": image}
         response = requests.post(f"{API_DIAGNO}/diagno", files=files, verify=False)
-        return response.json()
+        if response.status_code != 200:
+            print(f'Error: {response.status_code}')
+            print(response.text)
+        else:
+            return response.json()
 
 def call_mock_api_treatment(disease):
     """Appel API pour obtenir les traitements."""
@@ -53,7 +57,11 @@ def call_mock_api_treatment(disease):
         return treatment
     else:
         response = requests.post(f"{API_SOLUTIONS}/treatment", json={"disease": disease}, verify=False)
-        return response.json()
+        if response.status_code != 200:
+            print(f'Error: {response.status_code}')
+            print(response.text)
+        else:
+            return response.json()
 
 def main():
     st.title("VitiScan Pro: Diagnostic & Gestion des Vignes")
