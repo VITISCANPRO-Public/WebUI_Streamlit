@@ -1,16 +1,22 @@
-# app.py
+import os
+import json
 import streamlit as st
 import requests
 import folium
 from PIL import Image, ExifTags
 from streamlit_folium import st_folium
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # API URL (à adapter selon déploiement)
-# TODO récupérer ces variables dans le .env avec dotenv
-# sur HuggingFace le port sera forcément 7860 mais des hostnames différents
-# alors qu'en local ce sera l'inverse
-API_DIAGNO="http://localhost:8000"
-API_SOLUTIONS="http://localhost:9090"
+MOCK = int(os.getenv("MOCK", "0"))
+API_DIAGNO = os.getenv("API_DIAGNO", "https://localhost:8000")
+API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000")
+
+# mock data
+TREATMENTS = { 'Mildiou' : '<ol><li>Curatif: Boullie bordelaise bla bla bla bla bla</li><li>Préventif: sdkfsdmfkj</li></ol>',
+                'Anthracnose' : '<ol><li>Curatif: bla bla bla bla</li><li>Préventif: ipsum loredum etc.</li></ol>'}
 
 def get_exif_data(image):
     """Extrait les données EXIF (latitude, longitude) de l'image."""
@@ -22,10 +28,8 @@ def get_exif_data(image):
                 decoded = ExifTags.TAGS.get(tag, tag)
                 if decoded == "GPSInfo":
                     degre,minute,seconde = value[2]
-                    #print(degre, minute, seconde)
                     lat = int(degre) + int(minute)/60 + int(seconde)/3600
                     degre,minute,seconde = value[4]
-                    #print(degre, minute, seconde)
                     lon = int(degre) + int(minute)/60 + int(seconde)/3600
                     return (lon,lat)
     except Exception as e:
@@ -35,13 +39,21 @@ def get_exif_data(image):
 def call_mock_api_diagnostic(image):
     """Appel API pour obtenir un diagnostic."""
     files = {"file": image}
-    response = requests.post(f"{API_DIAGNO}/diagno", files=files, verify=False)
-    return response.json()
+    if MOCK == 1:
+        diagnostic = [{'disease':'Mildiou', 'confidence':0.96 }, {'disease':'Anthracnose', 'confidence':0.75 }]
+        return diagnostic
+    else:
+        response = requests.post(f"{API_DIAGNO}/diagno", files=files, verify=False)
+        return response.json()
 
 def call_mock_api_treatment(disease):
     """Appel API pour obtenir les traitements."""
-    response = requests.post(f"{API_SOLUTIONS}/treatment", json={"disease": disease}, verify=False)
-    return response.json()
+    if MOCK == 1:
+        treatment = TREATMENTS[disease]
+        return treatment
+    else:
+        response = requests.post(f"{API_SOLUTIONS}/treatment", json={"disease": disease}, verify=False)
+        return response.json()
 
 def main():
     st.title("VitiScan Pro: Diagnostic & Gestion des Vignes")
@@ -50,23 +62,19 @@ def main():
 
     with col1:
         st.subheader("Diagnostic Foliaire & Actions")
-        uploaded_file = st.file_uploader("Télchargez une photo de feuille de vigne", type=["jpg", "png","jpeg"])
+        uploaded_file = st.file_uploader("Téléchargez une photo de feuille de vigne", type=["jpg", "png","jpeg"])
 
         if uploaded_file:
             st.image(uploaded_file, caption="Feuille téléchargée", width=300)
 
             # Appel à l'API pour le diagnostic
-            # A DECOMMENTER lorsque API diagno opérationnelle
             diagnostic = call_mock_api_diagnostic(uploaded_file)
-            #diagnostic = [{'disease':'mildiou', 'probability':0.96 }]
             st.write("### Maladies détectées :")
             for disease in diagnostic:
                 if st.button(disease["disease"]):
-                    # A DECOMMENTER lorsque API treatment opérationnelle
-                    #treatment = call_mock_api_treatment(disease["disease"])
-                    treatment = "1. Curatif: Boullie bordelaise bla bla bla bla bla"
+                    treatment = call_mock_api_treatment(disease["disease"])
                     st.write("#### Traitements recommandés :")
-                    #st.write(treatment["treatment"])
+                    st.html(treatment)
 
     with col2:
         st.subheader("Carte Interactive des Parcelles")
@@ -74,8 +82,7 @@ def main():
         lon,lat = get_exif_data(uploaded_file)
         if lon is not None and lat is not None:
             # Exemple simplifié : création d'une carte centrée sur les coordonnées EXIF
-            #print("long=", lon, " lat=", lat)
-            m = folium.Map(location=[lat, lon], zoom_start=12)
+            m = folium.Map(location=[lat, lon], zoom_start=10)
             folium.Marker([lat, lon], popup="Parcelle").add_to(m)
             st_folium(m, width=500, height=500)
         else:
