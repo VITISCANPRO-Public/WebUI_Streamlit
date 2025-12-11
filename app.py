@@ -100,14 +100,16 @@ def main():
             else:
                 st.write("### Maladies détectées :")
                 if diagnostic is list:
+                    # ATTENTION cas du MOCK=1 qui renvoie une liste de dict
                     for disease in diagnostic:
                         if st.button(disease["disease"]):
                             treatment = call_mock_api_treatment(disease["disease"])
                             st.write("#### Traitements recommandés :")
                             st.html(treatment)
                 else:
-                    if st.button(disease["disease"]):
-                            treatment = call_mock_api_treatment(disease["disease"])
+                    # ATTENTION cas du MOCK=0 qui renvoie un dict
+                    if st.button(diagnostic["disease"]):
+                            treatment = call_mock_api_treatment(diagnostic["disease"])
                             st.write("#### Traitements recommandés :")
                             st.html(treatment)
 
