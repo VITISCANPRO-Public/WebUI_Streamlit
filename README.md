@@ -28,7 +28,7 @@ __Auteurs__ : Mounia, Inti, Samuel, Guillaume
 
 - pour builder l'image docker : `docker build . -t streamlit_vitiscan`
 
-- ensuite pour le développement : `docker run -it -v "$(pwd):/app" -p 7860:7860 streamlit_vitiscan`
+- ensuite pour le développement : `docker run -it --env-file .env -v "$(pwd):/app" -p 7860:7860 streamlit_vitiscan`
 
 ## Déploiement de l'image Docker sur HuggingFace
 
