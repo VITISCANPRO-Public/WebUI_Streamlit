@@ -11,8 +11,14 @@ load_dotenv()
 
 # API URL (à adapter selon déploiement)
 MOCK = int(os.getenv("MOCK", "0"))
-API_DIAGNO = os.getenv("API_DIAGNO", "https://localhost:8000")
-API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000")
+API_DIAGNO = os.getenv("API_DIAGNO", "https://localhost:4000").replace('"','')
+API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000").replace('"','')
+
+# 
+HEADERS = {
+    'Accept-Encoding':'gzip, deflate, br, zstd',
+    'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0'
+}
 
 # mock data
 TREATMENTS = { 'Mildiou' : '<ol><li>Curatif: Boullie bordelaise bla bla bla bla bla</li><li>Préventif: sdkfsdmfkj</li></ol>',
@@ -32,18 +38,28 @@ def get_exif_data(image):
                     degre,minute,seconde = value[4]
                     lon = int(degre) + int(minute)/60 + int(seconde)/3600
                     return (lon,lat)
+                else:
+                    st.write("Pas de données de localisation dans l'image")
+        else:
+            st.write("Pas de données de localisation dans l'image")
     except Exception as e:
-        st.error(f"Erreur EXIF: {e}")
+        #st.error(f"Erreur EXIF: {e}")
+        pass
     return (0,0)
 
 def call_mock_api_diagnostic(image):
     """Appel API pour obtenir un diagnostic."""
     if MOCK == 1:
+        # ATTENTION ici en mock je renvoie un tableau de dictionnaires
         diagnostic = [{'disease':'Mildiou', 'confidence':0.96 }, {'disease':'Anthracnose', 'confidence':0.75 }]
+        #diagnostic = {'disease':'Anthracnose', 'confidence':0.75, 'model_version': 'Resnet34_30ep_v1' }
         return diagnostic
     else:
+        # ATTENTION ici l'API renvoie un dictionnaire seulement
         files = {"file": image}
-        response = requests.post(f"{API_DIAGNO}/diagno", files=files, verify=False)
+        url = API_DIAGNO + "/diagno"
+        st.write('url=', url)
+        response = requests.post(url, files=files, verify=False, headers=HEADERS)
         if response.status_code != 200:
             print(f'Error: {response.status_code}')
             print(response.text)
@@ -65,6 +81,7 @@ def call_mock_api_treatment(disease):
             return response.json()
 
 def main():
+    st.write(f"CONFIGURATION DEBUG\n{API_DIAGNO}\n{API_SOLUTIONS}\n{MOCK}")
     st.title("VitiScan Pro: Diagnostic & Gestion des Vignes")
 
     col1, col2 = st.columns(2)
@@ -74,19 +91,25 @@ def main():
         uploaded_file = st.file_uploader("Téléchargez une photo de feuille de vigne", type=["jpg", "png","jpeg"])
 
         if uploaded_file:
-            st.image(uploaded_file, caption="Feuille téléchargée", width=300)
+            st.image(uploaded_file, caption="Image téléchargée", width=300)
 
             # Appel à l'API pour le diagnostic
             diagnostic = call_mock_api_diagnostic(uploaded_file)
             if 'error' in diagnostic.keys():
-                st.write(f"Error {diagnostic['status_code']} : {diagnostic['error']}")
+                st.write(f"Error {diagnostic['status_code']}")
             else:
                 st.write("### Maladies détectées :")
-                for disease in diagnostic:
+                if diagnostic is list:
+                    for disease in diagnostic:
+                        if st.button(disease["disease"]):
+                            treatment = call_mock_api_treatment(disease["disease"])
+                            st.write("#### Traitements recommandés :")
+                            st.html(treatment)
+                else:
                     if st.button(disease["disease"]):
-                        treatment = call_mock_api_treatment(disease["disease"])
-                        st.write("#### Traitements recommandés :")
-                        st.html(treatment)
+                            treatment = call_mock_api_treatment(disease["disease"])
+                            st.write("#### Traitements recommandés :")
+                            st.html(treatment)
 
     with col2:
         st.subheader("Carte Interactive des Parcelles")
