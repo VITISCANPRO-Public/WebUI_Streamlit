@@ -47,6 +47,7 @@ def call_mock_api_diagnostic(image):
         if response.status_code != 200:
             print(f'Error: {response.status_code}')
             print(response.text)
+            return {'error': response.text, 'status_code': response.status_code }
         else:
             return response.json()
 
@@ -77,12 +78,15 @@ def main():
 
             # Appel à l'API pour le diagnostic
             diagnostic = call_mock_api_diagnostic(uploaded_file)
-            st.write("### Maladies détectées :")
-            for disease in diagnostic:
-                if st.button(disease["disease"]):
-                    treatment = call_mock_api_treatment(disease["disease"])
-                    st.write("#### Traitements recommandés :")
-                    st.html(treatment)
+            if 'error' in diagnostic.keys():
+                st.write(f"Error {diagnostic['status_code']} : {diagnostic['error']}")
+            else:
+                st.write("### Maladies détectées :")
+                for disease in diagnostic:
+                    if st.button(disease["disease"]):
+                        treatment = call_mock_api_treatment(disease["disease"])
+                        st.write("#### Traitements recommandés :")
+                        st.html(treatment)
 
     with col2:
         st.subheader("Carte Interactive des Parcelles")
