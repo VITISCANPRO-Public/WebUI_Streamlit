@@ -21,7 +21,7 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r /tmp/requirements
 
 # Copy all local files to /home/user/app with "user" as owner of these files
 # Always use --chown=user when using HUGGINGFACE to avoid permission errors
-COPY --chown=user Dockerfile app.py entrypoint.sh $HOME/app/
+COPY --chown=user Dockerfile app.py README.md $HOME/app/
 
 EXPOSE 7860
 
