@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 RUN apt-get update \
     && apt-get install -y vim nano unzip curl \
@@ -21,11 +21,11 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r /tmp/requirements
 
 # Copy all local files to /home/user/app with "user" as owner of these files
 # Always use --chown=user when using HUGGINGFACE to avoid permission errors
-COPY --chown=user Dockerfile app.py $HOME/app/
+COPY --chown=user Dockerfile app.py entrypoint.sh $HOME/app/
 
 EXPOSE 7860
 
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+CMD ["/bin/bash", "-c", "streamlit run app.py --server.port=$STREAMLIT_SERVER_PORT --server.address=0.0.0.0"]
 
 # en prod préférable d'utiliser un entrypoint
 #ENTRYPOINT ["/bin/bash", "-c", "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0"]
