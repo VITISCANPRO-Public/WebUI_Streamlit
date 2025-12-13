@@ -7,6 +7,8 @@ RUN apt-get update \
 # THIS IS SPECIFIC TO HUGGINFACE
 # We create a new user named "user" with ID of 1000
 RUN useradd -m -u 1000 user
+RUN mkdir -p /home/user/app/.streamlit
+
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
@@ -22,6 +24,7 @@ RUN pip install --upgrade pip && pip install --no-cache-dir -r /tmp/requirements
 # Copy all local files to /home/user/app with "user" as owner of these files
 # Always use --chown=user when using HUGGINGFACE to avoid permission errors
 COPY --chown=user Dockerfile app.py README.md $HOME/app/
+COPY --chown=user .streamlit/config.toml $HOME/app/.streamlit/
 
 EXPOSE 7860
 
