@@ -180,13 +180,15 @@ def main():
         diagno = st.session_state.diagnostic
         if 'error' in diagno.keys():
             st.write(f"Error {diagno['status_code']}")
-        elif 'disease' in diagno.keys():
+        elif 'predictions' in diagno.keys():
+            predictions = diagno['predictions']
+            best_predict = predictions[0]
             st.write("### Diagnostic :")
             col11,col12 = st.columns(2)
             with col11:
-                st.metric(label="Maladie détectée", value=diagno.get('disease','N/A'))
+                st.metric(label="Maladie détectée", value=best_predict.get('disease','N/A'))
             with col12:
-                confidence = diagno.get('confidence', 0)
+                confidence = best_predict.get('confidence', 0)
                 st.metric(label="Indice de confiance", value=f"{confidence*100:.1f}%")
         
         st.divider()
