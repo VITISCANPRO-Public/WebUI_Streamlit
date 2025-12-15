@@ -202,7 +202,7 @@ def main():
             # rendre les champs invisibles
             placeholder = st.empty()
             with placeholder.container():
-                cnn_label = st.text_input("cnn_label", diagno["disease"], disabled=True)
+                cnn_label = st.text_input("cnn_label", best_predict.get("disease", "Aucune maladie"), disabled=True)
                 date_iso = st.text_input("date_iso", st.session_state.img_date, disabled=True) # TODO récupérer la date de la photo
                 debug = st.checkbox("Inclure le raw LLM output (debug)", value='hidden')
             if not DEBUG:
