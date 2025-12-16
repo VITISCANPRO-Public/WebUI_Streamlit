@@ -47,7 +47,9 @@ SESSION_CONTAINERS = ['vitiscan_form', 'container_diagno', 'container_solutions'
 
 def reset_form_and_containers():
     '''Reinit session vars, form and containers when uploaded file change'''
-    for key in SESSION_VARS+SESSION_CONTAINERS:
+    for key in SESSION_VARS:
+        if st.session_state.get(key): del st.session_state[key]
+    for key in SESSION_CONTAINERS:
         if st.session_state.get(key): del st.session_state[key]
     st.rerun()
 
@@ -156,18 +158,18 @@ def main():
         uploaded_file = st.file_uploader(
                 label="Téléchargez une photo de feuille de vigne",
                 type=["jpg", "png","jpeg"],
-                on_change=reset_form_and_containers
+                on_change=reset_form_and_containers,
             )
 
         if uploaded_file:
             st.image(uploaded_file, caption="Image téléchargée", width=300)
-        #else:
-        #    if st.session_state.previous_file is not None:
-        #        st.success("Fichier supprimé")
-        #        # on supprime toutes les vars de sesssion + form
-        #        for key in SESSION_VARS:
-        #            if st.session_state.get(key): del st.session_state[key]
-        #        st.rerun()
+        else:
+            if st.session_state.previous_file is not None:
+                st.success("Fichier supprimé")
+                # on supprime toutes les vars de sesssion + form
+                for key in SESSION_VARS:
+                    if st.session_state.get(key): del st.session_state[key]
+                st.rerun()
 
         submit = st.button(
             label="Lancer le diagnostic",
