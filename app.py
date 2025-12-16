@@ -30,12 +30,24 @@ DISEASE_TRANSLATION = {
     "N/A":"N/A"
 }
 
+OPTIONS_MODE = ["conventionnel", "bio"]
+OPTIONS_SEVERITY = ["faible", "modérée", "forte"]
+
 HEADERS = {
 #    'Content-Type' : 'application/json',
     'Accept-Encoding':'gzip, deflate, br, zstd',
     'User-Agent':'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0'
 }
 NOW = datetime.now().strftime("%Y-%m-%d")
+
+SESSION_VARS = ['payload', 'solutions', 'diagnostic', 'img_date', 'img_long', 'img_lat', 'previous_file']
+SESSION_CONTAINERS = ['vitiscan_form', 'container_diagno', 'container_solutions']
+
+def reset_form_and_containers():
+    '''Reinit session vars, form and containers when uploaded file change'''
+    for key in SESSION_VARS+SESSION_CONTAINERS:
+        if st.session_state.get(key): del st.session_state[key]
+    st.rerun()
 
 def get_exif_data(image):
     """Extrait les données EXIF (latitude, longitude) de l'image."""
@@ -70,7 +82,12 @@ def call_api_diagnostic(uploaded_file):
     """Appel API pour obtenir un diagnostic."""
     if MOCK == 1:
         # ATTENTION ici en mock dictionnaire
-        diagnostic = {'disease':'Anthracnose', 'confidence':0.75, 'model_version': 'Resnet34_30ep_v1' }
+        diagnostic = {
+            'predictions' : [
+                {'disease': 'anthracnose', 'confidence': 0.75 },
+                {'disease': 'normal', 'confidence': 0.14 }],
+            'model_version': 'Resnet34_30ep_v1'
+        }
         return diagnostic
     else:
         # ATTENTION ici l'API renvoie un dictionnaire seulement
@@ -99,19 +116,10 @@ def call_api_solutions(diagno_payload):
             print(response.text)
         else:
             return response.json()
-
-SESSION_VARS = ['payload', 'solutions', 'diagnostic', 'img_date', 'img_long', 'img_lat', 'previous_file']
-
-def reset_form_and_containers():
-    '''Reinit form and containers when uploaded file change'''
-    # on supprime toutes les vars de sesssion + form
-    for key in SESSION_VARS:
-        if st.session_state.get(key): del st.session_state[key]
-    if st.session_state.get("container_diagno"): del st.session_state["container_diagno"]
-    if st.session_state.get("container_solutions"): del st.session_state["container_solutions"]
-    if st.session_state.get("vitiscan_form"): del st.session_state["vitiscan_form"]
-    st.rerun()
-
+        
+##############################################################
+#----------------------- MAIN -------------------------------
+##############################################################
 def main():
     
     st.markdown(
@@ -132,7 +140,6 @@ def main():
     col1, col2 = st.columns(2)
 
     # initialisation des variables de session
-    
     for key in SESSION_VARS:
         if key not in st.session_state:
             st.session_state[key] = None
@@ -222,8 +229,8 @@ def main():
             
             st.write("### Plan d'actions :")
 
-            mode = st.selectbox("Mode", ["conventionnel", "bio"], index=1)
-            severity = st.selectbox("Sévérité", ["faible", "modérée", "forte"], index=1)
+            mode = st.selectbox("Mode", OPTIONS_MODE, index=1)
+            severity = st.selectbox("Sévérité", OPTIONS_SEVERITY, index=1)
             area_ha = st.slider(label="Surface (ha)", min_value=0.1, max_value=5.0, value=0.5, step=0.1)
 
             # rendre les champs invisibles
@@ -235,7 +242,7 @@ def main():
                     cnn_label = st.text_input("cnn_label", best_predict.get("disease", "normal"), disabled=True)
                 else:
                     cnn_label = st.text_input("cnn_label", "N/A", disabled=True)
-                date_iso = st.text_input("date_iso", st.session_state.img_date, disabled=True) # TODO récupérer la date de la photo
+                date_iso = st.text_input("date_iso", st.session_state.img_date, disabled=True)
                 debug = st.checkbox("Inclure le raw LLM output (debug)", value='hidden')
             if not DEBUG:
                 placeholder.empty()
@@ -246,7 +253,11 @@ def main():
             diagno_payload = {
                 "cnn_label": cnn_label,
                 "mode": mode,
+                # TODO utiliser l'index de la combo
+                #"mode": OPTIONS_MODE.index(mode)
                 "severity": severity,
+                # TODO utiliser l'index de la combo
+                #"severity": OPTIONS_SEVERITY.index(severity),
                 "area_m2": area_ha * 10000,
                 "date_iso": date_iso,
                 "location": f"{st.session_state.img_lat},{st.session_state.img_long}"
