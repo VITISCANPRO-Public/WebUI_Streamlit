@@ -51,7 +51,7 @@ def reset_form_and_containers():
         if st.session_state.get(key): del st.session_state[key]
     for key in SESSION_CONTAINERS:
         if st.session_state.get(key): del st.session_state[key]
-    st.rerun()
+    #st.rerun()
 
 def get_exif_data(image):
     """Extrait les données EXIF (latitude, longitude) de l'image."""
@@ -104,13 +104,14 @@ def call_api_diagnostic(uploaded_file):
         else:
             return response.json()
 
-def call_api_solutions(diagno_payload):
+def call_api_solutions(diagno_payload, debug=False):
     """Appel API pour obtenir les traitements."""
     if MOCK == 1:
         treatment = { "data" : { "cnn_label": "normal", "treatment_plan": {"dose_l_ha": 200, "area_m2": 0.5} } }
         return treatment
     else:
         response = requests.post(f"{API_SOLUTIONS}/solutions",
+                                 params={'debug': str(debug) }
                                  json=diagno_payload,
                                  headers=HEADERS,
                                  timeout=60,
@@ -212,7 +213,7 @@ def main():
     if st.session_state.diagnostic:
         # ATTENTION renvoie un dict et pas une liste de dict
         diagno = st.session_state.diagnostic
-        with st.container(border=True, width="stretch", key="container_diagno"):
+        with st.container(key="container_diagno", width="stretch", border=True):
             if 'error' in diagno.keys():
                 st.write(f"Error {diagno['status_code']}")
             elif 'predictions' in diagno.keys():
@@ -230,7 +231,7 @@ def main():
         st.divider()
         
         # affichage du formulaire
-        with st.form(key="vitiscan_form", width="stretch"):
+        with st.form(key="vitiscan_form", width="stretch", border=True):
             
             st.write("### Plan d'actions :")
 
@@ -248,7 +249,7 @@ def main():
                 else:
                     cnn_label = st.text_input("cnn_label", "N/A", disabled=True)
                 date_iso = st.text_input("date_iso", st.session_state.img_date, disabled=True)
-                debug = st.checkbox("Inclure le raw LLM output (debug)", value='hidden')
+                debug = st.checkbox("Inclure le raw LLM output (debug)", disabled=True, value=(DEBUG==1))
             if not DEBUG:
                 placeholder.empty()
             
@@ -280,7 +281,7 @@ def main():
                 #if (cnn_label != "normal") or (cnn_label != "N/A"):
                 with st.spinner(text="Calcul du plan en cours..."):
                     try:
-                        response = call_api_solutions(diagno_payload)
+                        response = call_api_solutions(diagno_payload, debug)
                         st.session_state.solutions = response
                         st.success("Plan d'action terminé.")
                     except:
@@ -328,10 +329,10 @@ def main():
                         for w in d["warnings"]:
                             if w:
                                 st.markdown(f"- {w}")
-
-                #with st.expander("### Texte de conseil"):
-                #    if "advice_text" in d and d['advice_text']:
-                #        st.write(d["advice_text"])
+                if DEBUG:
+                    with st.expander("### DEBUG Raw LLM output"):
+                        if "raw_llm_output" in d and d['raw_llm_output']:
+                            st.write(d["raw_llm_output"])
 
 
 if __name__ == "__main__":
