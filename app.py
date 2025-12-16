@@ -246,17 +246,20 @@ def main():
                         st.code(json.dumps(diagno_payload, indent=2), language="json")
 
                 # TODO rajouter try/except
-                with st.spinner(text="Calcul du plan en cours..."):
-                    try:
-                        response = call_api_solutions(diagno_payload)
-                        st.session_state.solutions = response
-                        st.success("Plan d'action terminé.")
-                    except:
-                        st.error("Impossible de calculer le plan d'actions")
-                if DEBUG:
-                    with st.expander("DEBUG Réponse API solutions"):
-                        st.code(json.dumps(response, indent=2), language="json")
-
+                if (cnn_label != "normal") or (cnn_label != "N/A"):
+                    with st.spinner(text="Calcul du plan en cours..."):
+                        try:
+                            response = call_api_solutions(diagno_payload)
+                            st.session_state.solutions = response
+                            st.success("Plan d'action terminé.")
+                        except:
+                            st.error("Impossible de calculer le plan d'actions")
+                    if DEBUG:
+                        with st.expander("DEBUG Réponse API solutions"):
+                            st.code(json.dumps(response, indent=2), language="json")
+                else:
+                    st.write("Aucun plan d'action.")
+    
     ########## SECTION RESULTATS SOLUTIONS / TRAITEMENTS ########
     st.divider()
 
