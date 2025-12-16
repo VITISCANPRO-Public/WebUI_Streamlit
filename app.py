@@ -269,7 +269,8 @@ def main():
                 d = st.session_state.solutions["data"]
 
                 with st.expander("### Résumé traitement", width='stretch'):
-                    st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
+                    #st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
+                    st.markdown(f"**Maladie détectée** : {d.get('cnn_label', 'N/A')}")
                     st.markdown(f"**Gravité** : {d.get('severity', '')}")
                     st.markdown(f"**Mode** : {d.get('mode', '')}")
                     st.markdown(f"**Saison** : {d.get('season', '')}")
