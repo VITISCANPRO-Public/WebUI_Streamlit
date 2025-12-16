@@ -29,9 +29,11 @@ DISEASE_TRANSLATION = {
     "shot_hole": "Coryneum",
     "N/A":"N/A"
 }
-
 OPTIONS_MODE = ["conventionnel", "bio"]
 OPTIONS_SEVERITY = ["faible", "modérée", "forte"]
+
+# styles de carte pour Folium
+MAP_STYLE = ["OpenStreetMap", "CartoDB Positron", "CartoDB Voyager"]
 
 HEADERS = {
 #    'Content-Type' : 'application/json',
@@ -121,7 +123,8 @@ def call_api_solutions(diagno_payload):
 #----------------------- MAIN -------------------------------
 ##############################################################
 def main():
-    
+    # la modif du backgroundColor ne fonctionne pas dans .streamlit/config.toml
+    # il faut forcer par CSS
     st.markdown(
         """
         <style>
@@ -158,13 +161,13 @@ def main():
 
         if uploaded_file:
             st.image(uploaded_file, caption="Image téléchargée", width=300)
-        else:
-            if st.session_state.previous_file is not None:
-                st.success("Fichier supprimé")
-                # on supprime toutes les vars de sesssion + form
-                for key in SESSION_VARS:
-                    if st.session_state.get(key): del st.session_state[key]
-                st.rerun()
+        #else:
+        #    if st.session_state.previous_file is not None:
+        #        st.success("Fichier supprimé")
+        #        # on supprime toutes les vars de sesssion + form
+        #        for key in SESSION_VARS:
+        #            if st.session_state.get(key): del st.session_state[key]
+        #        st.rerun()
 
         submit = st.button(
             label="Lancer le diagnostic",
@@ -195,7 +198,7 @@ def main():
         # on affiche la carte si besoin
         if lon is not None and lat is not None:
             # Exemple simplifié : création d'une carte centrée sur les coordonnées EXIF
-            m = folium.Map(location=[lat, lon], zoom_start=12, height=600, width=300)
+            m = folium.Map(location=[lat, lon], zoom_start=12, height=600, width=300, tiles=MAP_STYLE[2])
             folium.Marker([lat, lon], popup="Parcelle").add_to(m)
             st_folium(m, height=600)
         else:
@@ -247,7 +250,7 @@ def main():
             if not DEBUG:
                 placeholder.empty()
             
-            submitted = st.form_submit_button("Demander un plan d'actions", type="primary")
+            submitted = st.form_submit_button("Demander un plan d'actions", type="primary", key="button_action_plan")
 
             # construction du payload JSON à partir du form
             diagno_payload = {
@@ -295,8 +298,7 @@ def main():
                 d = st.session_state.solutions["data"]
 
                 with st.expander("### Résumé traitement", width='stretch'):
-                    #st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
-                    st.markdown(f"**Maladie détectée** : {d.get('cnn_label', 'N/A')}")
+                    st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
                     st.markdown(f"**Gravité** : {d.get('severity', '')}")
                     st.markdown(f"**Mode** : {d.get('mode', '')}")
                     st.markdown(f"**Saison** : {d.get('season', '')}")
@@ -325,9 +327,9 @@ def main():
                             if w:
                                 st.markdown(f"- {w}")
 
-                with st.expander("### Texte de conseil"):
-                    if "advice_text" in d and d['advice_text']:
-                        st.write(d["advice_text"])
+                #with st.expander("### Texte de conseil"):
+                #    if "advice_text" in d and d['advice_text']:
+                #        st.write(d["advice_text"])
 
 
 if __name__ == "__main__":
