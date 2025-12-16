@@ -18,6 +18,7 @@ API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000").replace('"'
 MOCK = int(os.getenv("MOCK", "0"))
 DEBUG = int(os.getenv("DEBUG", "0"))
 
+# TODO la traduction devrait etre faite dans l'API solutions
 DISEASE_TRANSLATION = {
     "anthracnose": "Anthracnose",
     "brown_spot": "Tâche brune",
@@ -58,8 +59,6 @@ def get_exif_data(image):
                     except:
                         # error ou date non renseignée
                         pass
-                #else:
-                #    st.write("Pas de données de localisation dans l'image")
         #else:
         #    st.write("Pas de données de localisation dans l'image")
     except Exception as e:
@@ -120,19 +119,11 @@ def main():
 
     col1, col2 = st.columns(2)
 
-    # gestion session
-    if "payload" not in st.session_state:
-        st.session_state.payload = None
-    if "solutions" not in st.session_state:
-        st.session_state.solutions = None
-    if "diagnostic" not in st.session_state:
-        st.session_state.diagnostic = None
-    if "img_date" not in st.session_state:
-        st.session_state.img_date = None
-    if "img_long" not in st.session_state:
-        st.session_state.img_long = None
-    if "img_lat" not in st.session_state:
-        st.session_state.img_lat = None
+    # initialisation des variables de session
+    session_vars = ['payload', 'solutions', 'diagnostic', 'img_date', 'img_long', 'img_lat', 'previous_file']
+    for key in session_vars:
+        if key not in st.session_state:
+            st.session_state[key] = None
 
     if DEBUG:
         st.sidebar.write("DEBUG Session State:", st.session_state)
@@ -147,6 +138,13 @@ def main():
 
         if uploaded_file:
             st.image(uploaded_file, caption="Image téléchargée", width=300)
+        else:
+            if st.session_state.previous_file is not None:
+                st.success("Fichier supprimé")
+                # on supprime toutes les vars de sesssion + form
+                for key in session_vars:
+                    if st.session_state.get(key): del st.session_state[key]
+                st.rerun()
 
         submit = st.button(
             label="Lancer le diagnostic",
