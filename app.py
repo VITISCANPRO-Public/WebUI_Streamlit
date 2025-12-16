@@ -111,7 +111,7 @@ def call_api_solutions(diagno_payload, debug=False):
         return treatment
     else:
         response = requests.post(f"{API_SOLUTIONS}/solutions",
-                                 params={'debug': str(debug) }
+                                 params={'debug': str(debug) },
                                  json=diagno_payload,
                                  headers=HEADERS,
                                  timeout=60,
