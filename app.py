@@ -198,7 +198,7 @@ def main():
         # on affiche la carte si besoin
         if lon is not None and lat is not None:
             # Exemple simplifié : création d'une carte centrée sur les coordonnées EXIF
-            m = folium.Map(location=[lat, lon], zoom_start=12, height=600, width=300, tiles=MAP_STYLE[2])
+            m = folium.Map(location=[lat, lon], zoom_start=12, height=600, width=300, tiles=MAP_STYLE[0])
             folium.Marker([lat, lon], popup="Parcelle").add_to(m)
             st_folium(m, height=600)
         else:
