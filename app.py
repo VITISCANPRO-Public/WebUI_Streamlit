@@ -100,6 +100,18 @@ def call_api_solutions(diagno_payload):
         else:
             return response.json()
 
+SESSION_VARS = ['payload', 'solutions', 'diagnostic', 'img_date', 'img_long', 'img_lat', 'previous_file']
+
+def reset_form_and_containers():
+    '''Reinit form and containers when uploaded file change'''
+    # on supprime toutes les vars de sesssion + form
+    for key in SESSION_VARS:
+        if st.session_state.get(key): del st.session_state[key]
+    if st.session_state.get("container_diagno"): del st.session_state["container_diagno"]
+    if st.session_state.get("container_solutions"): del st.session_state["container_solutions"]
+    if st.session_state.get("vitiscan_form"): del st.session_state["vitiscan_form"]
+    st.rerun()
+
 def main():
     
     st.markdown(
@@ -120,8 +132,8 @@ def main():
     col1, col2 = st.columns(2)
 
     # initialisation des variables de session
-    session_vars = ['payload', 'solutions', 'diagnostic', 'img_date', 'img_long', 'img_lat', 'previous_file']
-    for key in session_vars:
+    
+    for key in SESSION_VARS:
         if key not in st.session_state:
             st.session_state[key] = None
 
@@ -133,7 +145,8 @@ def main():
 
         uploaded_file = st.file_uploader(
                 label="Téléchargez une photo de feuille de vigne",
-                type=["jpg", "png","jpeg"]
+                type=["jpg", "png","jpeg"],
+                on_change=reset_form_and_containers
             )
 
         if uploaded_file:
@@ -142,7 +155,7 @@ def main():
             if st.session_state.previous_file is not None:
                 st.success("Fichier supprimé")
                 # on supprime toutes les vars de sesssion + form
-                for key in session_vars:
+                for key in SESSION_VARS:
                     if st.session_state.get(key): del st.session_state[key]
                 st.rerun()
 
@@ -187,24 +200,28 @@ def main():
     if st.session_state.diagnostic:
         # ATTENTION renvoie un dict et pas une liste de dict
         diagno = st.session_state.diagnostic
-        if 'error' in diagno.keys():
-            st.write(f"Error {diagno['status_code']}")
-        elif 'predictions' in diagno.keys():
-            predictions = diagno['predictions']
-            best_predict = predictions[0]
-            st.write("### Diagnostic :")
-            col11,col12 = st.columns(2)
-            with col11:
-                disease = best_predict.get('disease','N/A')
-                st.metric(label="Maladie détectée", value=DISEASE_TRANSLATION[disease])
-            with col12:
-                confidence = best_predict.get('confidence', 0)
-                st.metric(label="Indice de confiance", value=f"{confidence*100:.1f}%")
+        with st.container(border=True, width="stretch", key="container_diagno"):
+            if 'error' in diagno.keys():
+                st.write(f"Error {diagno['status_code']}")
+            elif 'predictions' in diagno.keys():
+                predictions = diagno['predictions']
+                best_predict = predictions[0]
+                st.write("### Diagnostic :")
+                col11,col12 = st.columns(2)
+                with col11:
+                    disease = best_predict.get('disease','N/A')
+                    st.metric(label="Maladie détectée", value=DISEASE_TRANSLATION[disease])
+                with col12:
+                    confidence = best_predict.get('confidence', 0)
+                    st.metric(label="Indice de confiance", value=f"{confidence*100:.1f}%")
         
         st.divider()
-        st.write("### Plan d'actions :")
+        
         # affichage du formulaire
-        with st.form("vitiscan_form"):
+        with st.form(key="vitiscan_form", width="stretch"):
+            
+            st.write("### Plan d'actions :")
+
             mode = st.selectbox("Mode", ["conventionnel", "bio"], index=1)
             severity = st.selectbox("Sévérité", ["faible", "modérée", "forte"], index=1)
             area_ha = st.slider(label="Surface (ha)", min_value=0.1, max_value=5.0, value=0.5, step=0.1)
@@ -262,7 +279,7 @@ def main():
     st.divider()
 
     if st.session_state.solutions:
-        with st.container(border=True, width="stretch"):
+        with st.container(border=True, width="stretch", key="container_solutions"):
             if "data" in st.session_state.solutions:
                 d = st.session_state.solutions["data"]
 
