@@ -18,6 +18,17 @@ API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000").replace('"'
 MOCK = int(os.getenv("MOCK", "0"))
 DEBUG = int(os.getenv("DEBUG", "0"))
 
+DISEASE_TRANSLATION = {
+    "anthracnose": "Anthracnose",
+    "brown_spot": "Tâche brune",
+    "downy_mildew": "Mildiou",
+    "mites": "Acariens",
+    "normal": "Pas de maladie",
+    "powdery_mildew": "Oïdium",
+    "shot_hole": "Coryneum",
+    "N/A":"N/A"
+}
+
 HEADERS = {
 #    'Content-Type' : 'application/json',
     'Accept-Encoding':'gzip, deflate, br, zstd',
@@ -186,7 +197,8 @@ def main():
             st.write("### Diagnostic :")
             col11,col12 = st.columns(2)
             with col11:
-                st.metric(label="Maladie détectée", value=best_predict.get('disease','N/A'))
+                disease = best_predict.get('disease','N/A')
+                st.metric(label="Maladie détectée", value=DISEASE_TRANSLATION[disease])
             with col12:
                 confidence = best_predict.get('confidence', 0)
                 st.metric(label="Indice de confiance", value=f"{confidence*100:.1f}%")
@@ -202,7 +214,12 @@ def main():
             # rendre les champs invisibles
             placeholder = st.empty()
             with placeholder.container():
-                cnn_label = st.text_input("cnn_label", best_predict.get("disease", "Aucune maladie"), disabled=True)
+                if 'predictions' in diagno.keys():
+                    predictions = diagno['predictions']
+                    best_predict = predictions[0]
+                    cnn_label = st.text_input("cnn_label", best_predict.get("disease", "normal"), disabled=True)
+                else:
+                    cnn_label = st.text_input("cnn_label", "N/A", disabled=True)
                 date_iso = st.text_input("date_iso", st.session_state.img_date, disabled=True) # TODO récupérer la date de la photo
                 debug = st.checkbox("Inclure le raw LLM output (debug)", value='hidden')
             if not DEBUG:
