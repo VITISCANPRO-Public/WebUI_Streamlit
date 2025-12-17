@@ -216,10 +216,8 @@ def main():
             st.warning("Aucune donnée de localisation trouvée dans l'image.")
 
     ############ SECTION RESULTAT DIAGNO ##########
-    st.divider()
-
     if st.session_state.diagnostic:
-        # ATTENTION renvoie un dict et pas une liste de dict
+        st.divider()
         diagno = st.session_state.diagnostic
         with st.container(key="container_diagno", width="stretch", border=True):
             if 'error' in diagno.keys():
@@ -315,18 +313,19 @@ def main():
                 #    st.write("Aucun plan d'action.")
     
     ########## SECTION RESULTATS SOLUTIONS / TRAITEMENTS ########
-    st.divider()
-
     if st.session_state.solutions:
         with st.container(border=True, width="stretch", key="container_solutions"):
             if "data" in st.session_state.solutions:
                 d = st.session_state.solutions["data"]
+                
+                st.divider()
 
                 with st.expander("### Résumé traitement", width='stretch', expanded=True):
                     st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
                     st.markdown(f"**Gravité** : {d.get('severity', '')}")
                     st.markdown(f"**Mode** : {d.get('mode', '')}")
                     st.markdown(f"**Saison** : {d.get('season', '')}")
+
                     if "treatment_plan" in d and d["treatment_plan"]:
                         tp = d['treatment_plan']
                         if "dose_l_ha" in tp and tp['dose_l_ha']:
@@ -355,7 +354,6 @@ def main():
                     with st.expander("### DEBUG Raw LLM output", width='stretch', expanded=False):
                         if "raw_llm_output" in d and d['raw_llm_output']:
                             st.write(d["raw_llm_output"])
-
 
 if __name__ == "__main__":
     main()
