@@ -156,8 +156,8 @@ def main():
             st.session_state[key] = None
 
     if DEBUG:
-        with st.sidebar as sdbar:
-            sdbar.write("DEBUG Session State:", st.session_state)
+        with st.sidebar:
+            st.write("DEBUG Session State:", st.session_state)
             if st.button("Rafraîchir"):
                 st.rerun()
 
