@@ -248,13 +248,13 @@ def main():
             mode = st.selectbox(
                 label="Mode",
                 options = OPTIONS_MODE.keys(),
-                format_func=lambda x : OPTIONS_MODE[x]
+                format_func=lambda x : OPTIONS_MODE[x],
                 index=1
             )
             severity = st.selectbox(
                 label="Sévérité",
                 options = OPTIONS_SEVERITY.keys(),
-                format_func=lambda x : OPTIONS_SEVERITY[x]
+                format_func=lambda x : OPTIONS_SEVERITY[x],
                 index=0
             )
 
