@@ -325,6 +325,8 @@ def main():
 
                     if "treatment_plan" in d and d["treatment_plan"]:
                         tp = d['treatment_plan']
+                        if 'treatment_product' in tp and tp['treatment_product']:
+                            st.markdown(f"**Produit à utiliser** : {tp.get('treatment_product')}")
                         if "dose_l_ha" in tp and tp['dose_l_ha']:
                             st.markdown(f"- **Dose par ha** : {tp['dose_l_ha']} L/ha")
                             st.markdown(f"- **Surface** : {tp.get('area_m2')} m2")
