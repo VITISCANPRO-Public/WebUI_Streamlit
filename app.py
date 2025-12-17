@@ -148,13 +148,13 @@ def main():
     for key in SESSION_VARS:
         if key not in st.session_state:
             st.session_state[key] = None
-
-    if DEBUG:
-        st.write("DEBUG Session State:", st.session_state)
     
     st.set_page_config(page_title="VitiScan Pro", page_icon="🍇")
     
     st.title("VitiScan Pro: Diagnostic & Gestion des Vignes")
+
+    if DEBUG:
+        st.sidebar.write("DEBUG Session State:", st.session_state)
 
     col1, col2 = st.columns(2)
 
