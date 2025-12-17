@@ -144,19 +144,19 @@ def main():
         unsafe_allow_html=True
     )
 
-    st.set_page_config(page_title="VitiScan Pro", page_icon="🍇")
-    
-    st.title("VitiScan Pro: Diagnostic & Gestion des Vignes")
-
-    col1, col2 = st.columns(2)
-
     # initialisation des variables de session
     for key in SESSION_VARS:
         if key not in st.session_state:
             st.session_state[key] = None
 
     if DEBUG:
-        st.write("DEBUG Session State:", st.session_state) 
+        st.write("DEBUG Session State:", st.session_state)
+    
+    st.set_page_config(page_title="VitiScan Pro", page_icon="🍇")
+    
+    st.title("VitiScan Pro: Diagnostic & Gestion des Vignes")
+
+    col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("Diagnostic Foliaire")
@@ -316,6 +316,7 @@ def main():
                 d = st.session_state.solutions["data"]
                 
                 #st.divider()
+
                 with st.expander("### Résumé traitement", width='stretch', expanded=True):
                     st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
                     st.markdown(f"**Gravité** : {d.get('severity', '')}")
