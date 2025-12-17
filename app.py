@@ -156,10 +156,7 @@ def main():
             st.session_state[key] = None
 
     if DEBUG:
-        with st.sidebar:
-            st.write("DEBUG Session State:", st.session_state)
-            if st.button("Rafraîchir"):
-                st.rerun()
+        st.write("DEBUG Session State:", st.session_state) 
 
     with col1:
         st.subheader("Diagnostic Foliaire")
@@ -217,7 +214,7 @@ def main():
 
     ############ SECTION RESULTAT DIAGNO ##########
     if st.session_state.diagnostic:
-        st.divider()
+        #st.divider()
         diagno = st.session_state.diagnostic
         with st.container(key="container_diagno", width="stretch", border=True):
             if 'error' in diagno.keys():
@@ -234,7 +231,7 @@ def main():
                     confidence = best_predict.get('confidence', 0)
                     st.metric(label="Indice de confiance", value=f"{confidence*100:.1f}%")
         
-        st.divider()
+        #st.divider()
         
         # affichage du formulaire
         with st.form(key="vitiscan_form", width="stretch", border=True):
@@ -318,8 +315,7 @@ def main():
             if "data" in st.session_state.solutions:
                 d = st.session_state.solutions["data"]
                 
-                st.divider()
-
+                #st.divider()
                 with st.expander("### Résumé traitement", width='stretch', expanded=True):
                     st.markdown(f"**Maladie détectée** : {DISEASE_TRANSLATION[d.get('cnn_label', 'N/A')]}")
                     st.markdown(f"**Gravité** : {d.get('severity', '')}")
