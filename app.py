@@ -188,7 +188,7 @@ def main():
                 # Appel à l'API pour le diagnostic
                 diagnostic = call_api_diagnostic(uploaded_file)
                 st.session_state.diagnostic = diagnostic
-                st.success("Diagnostic terminée.")
+                st.success("Diagnostic terminé.")
 
                 if DEBUG:
                     with st.expander("DEBUG Réponse API diagno"):
