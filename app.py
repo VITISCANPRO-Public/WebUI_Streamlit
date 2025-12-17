@@ -29,8 +29,13 @@ DISEASE_TRANSLATION = {
     "shot_hole": "Coryneum",
     "N/A":"N/A"
 }
-OPTIONS_MODE = ["conventionnel", "bio"]
-OPTIONS_SEVERITY = ["faible", "modérée", "forte"]
+
+# TODO passer en id numérique si l'API solution évolue
+#OPTIONS_MODE = { 0 : "conventionnel", 1 : "bio" }
+#OPTIONS_SEVERITY = { 0 : "faible", 1 : "modérée", 2 : "forte" }
+# on reste en mode texte en attendant l'évol sur l'API solutions
+OPTIONS_MODE = { "conventionnel": "Conventionnel", "bio": "Bio" }
+OPTIONS_SEVERITY = { "faible": "Faible", "modérée": "Modérée", "forte": "Forte" }
 
 # styles de carte pour Folium
 MAP_STYLE = ["OpenStreetMap", "CartoDB Positron", "CartoDB Voyager"]
@@ -151,7 +156,10 @@ def main():
             st.session_state[key] = None
 
     if DEBUG:
-        st.sidebar.write("DEBUG Session State:", st.session_state)
+        with st.sidebar as sdbar:
+            sdbar.write("DEBUG Session State:", st.session_state)
+            if st.button("Rafraîchir"):
+                st.rerun()
 
     with col1:
         st.subheader("Diagnostic Foliaire")
@@ -235,11 +243,25 @@ def main():
             
             st.write("### Plan d'actions :")
 
-            mode = st.selectbox("Mode", OPTIONS_MODE, index=1)
-            severity = st.selectbox("Sévérité", OPTIONS_SEVERITY, index=1)
+            # sélection du mode et de la sévérité par select box
+            # la format_func permet d'afficher le label dans la selectbox mais renvoyer l'id
+            mode = st.selectbox(
+                label="Mode",
+                options = OPTIONS_MODE.keys(),
+                format_func=lambda x : OPTIONS_MODE[x]
+                index=1
+            )
+            severity = st.selectbox(
+                label="Sévérité",
+                options = OPTIONS_SEVERITY.keys(),
+                format_func=lambda x : OPTIONS_SEVERITY[x]
+                index=0
+            )
+
+            # séléction de la surface par slider
             area_ha = st.slider(label="Surface (ha)", min_value=0.1, max_value=5.0, value=0.5, step=0.1)
 
-            # rendre les champs invisibles
+            # rendre certains champs du formulaire invisibles (sauf en mode DEBUG)
             placeholder = st.empty()
             with placeholder.container():
                 if 'predictions' in diagno.keys():
