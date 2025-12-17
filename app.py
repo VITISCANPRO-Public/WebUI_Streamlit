@@ -163,7 +163,7 @@ def main():
 
         uploaded_file = st.file_uploader(
                 label="Téléchargez une photo de feuille de vigne",
-                type=["jpg", "png","jpeg"],
+                type=["jpg", "png","jpeg","webp"],
                 on_change=reset_form_and_containers,
             )
 
