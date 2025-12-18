@@ -319,23 +319,25 @@ def main():
                     st.markdown(f"**Saison** : {d.get('season', '')}")
 
                 with st.expander("### Actions de traitement", width='stretch', expanded=True):
-                    if "treatment_actions" in d and d["treatment_actions"]:
-                        for action in d["treatment_actions"]:
-                            if action:
-                                st.markdown(f"- {action}")
 
                     if "treatment_plan" in d and d["treatment_plan"]:
                         tp = d['treatment_plan']
                         if 'treatment_product' in tp and tp['treatment_product']:
                             treatment_product_list = tp['treatment_product']
-                            if treatment_product_list is list and len(treatment_product_list)>0:
-                                for item in treatment_product_list:
-                                    tp_key,tp_value = item.split(":")
-                                    st.markdown(f"- **{tp_key.strip()}** : {tp_value.strip()}")        
+                            #if treatment_product_list is list and len(treatment_product_list)>0:
+                            for item in treatment_product_list:
+                                tp_key,tp_value = item.split(":")
+                                st.markdown(f"- **{tp_key.strip()}** : {tp_value.strip()}")
+
                         if "dose_l_ha" in tp and tp['dose_l_ha']:
                             st.markdown(f"- **Dose par ha** : {tp['dose_l_ha']} L/ha")
                             st.markdown(f"- **Surface** : {tp.get('area_m2')} m2")
                             st.markdown(f"- **Volume total estimé** : {tp.get('volume_bouillie_l_ha')} L") 
+
+                    if "treatment_actions" in d and d["treatment_actions"]:
+                        for action in d["treatment_actions"]:
+                            if action:
+                                st.markdown(f"- {action}")
 
                 with st.expander("### Mesures préventives", width='stretch', expanded=True):
                     if "preventive_actions" in d and d["preventive_actions"]:
