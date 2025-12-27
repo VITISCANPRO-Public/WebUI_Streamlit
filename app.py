@@ -150,7 +150,7 @@ def get_diseases() -> tuple:
         return (dataset_name, diseases)
     else:
         try:
-            response = requests.get(f"{API_SOLUTIONS}/diseases",
+            response = requests.get(f"{API_DIAGNO}/diseases",
                                  headers=HEADERS,
                                  timeout=60,
                                  verify=False)
@@ -160,6 +160,7 @@ def get_diseases() -> tuple:
             logger.info(json_resp['dataset_name'])
             logger.info(json_resp['diseases'])
             return (json_resp['dataset_name'], dict(json_resp['diseases']))
+        
         except requests.exceptions.RequestException as e:
             logger.error(f'Error: {response.status_code} : {e}')
             
