@@ -149,19 +149,21 @@ def get_diseases() -> tuple:
         dataset_name = "kaggle"
         return (dataset_name, diseases)
     else:
-        response = requests.post(f"{API_SOLUTIONS}/diseases",
+        try:
+            response = requests.get(f"{API_SOLUTIONS}/diseases",
                                  headers=HEADERS,
                                  timeout=60,
                                  verify=False)
-        if response.status_code != 200:
-            logger.error(f'Error: {response.status_code}')
-            logger.error(response.text)
-        else:
+            response.raise_for_status() # lève une exception en cas d'un statut d'erreur
             json_resp = response.json()
             logger.info(json_resp)
             logger.info(json_resp['dataset_name'])
             logger.info(json_resp['diseases'])
             return (json_resp['dataset_name'], dict(json_resp['diseases']))
+        except requests.exceptions.RequestException as e:
+            logger.error(f'Error: {response.status_code} : {e}')
+            
+            
 
 ##############################################################
 #----------------------- MAIN -------------------------------
