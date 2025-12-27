@@ -178,7 +178,7 @@ def main():
     # récupération du dictionnaire des maladies et du nom du dataset
     DATASET_NAME, DISEASE_TRANSLATION = get_diseases()
     logger.info(f"Dataset name : {DATASET_NAME}")
-    logger.info("Diseases dictionnary translation:", json.dumps(DISEASE_TRANSLATION, indent=4,ensure_ascii=True))
+    logger.info(f"Diseases dictionnary translation: {json.dumps(DISEASE_TRANSLATION, indent=4,ensure_ascii=True)}")
 
     # initialisation des variables de session
     for key in SESSION_VARS:
