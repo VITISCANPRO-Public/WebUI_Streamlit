@@ -129,7 +129,7 @@ def call_api_solutions(diagno_payload, debug=False):
         else:
             return response.json()
 
-@st.cache
+@st.cache_data
 def get_diseases() -> tuple:
     '''
     Récupération des maladies du modèle via l'API diagno.
