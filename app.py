@@ -129,6 +129,7 @@ def call_api_solutions(diagno_payload, debug=False):
         else:
             return response.json()
 
+@st.cache
 def get_diseases() -> tuple:
     '''
     Récupération des maladies du modèle via l'API diagno.
@@ -156,9 +157,6 @@ def get_diseases() -> tuple:
                                  verify=False)
             response.raise_for_status() # lève une exception en cas d'un statut d'erreur
             json_resp = response.json()
-            logger.info(json_resp)
-            logger.info(json_resp['dataset_name'])
-            logger.info(json_resp['diseases'])
             return (json_resp['dataset_name'], dict(json_resp['diseases']))
         
         except requests.exceptions.RequestException as e:
