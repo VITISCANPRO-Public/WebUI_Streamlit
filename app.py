@@ -120,8 +120,8 @@ def call_api_solutions(diagno_payload, debug=False):
                                  timeout=60,
                                  verify=False)
         if response.status_code != 200:
-            print(f'Error: {response.status_code}')
-            print(response.text)
+            logger.error(f'Error: {response.status_code}')
+            logger.error(response.text)
         else:
             return response.json()
 
@@ -150,8 +150,8 @@ def get_diseases() -> tuple:
                                  timeout=60,
                                  verify=False)
         if response.status_code != 200:
-            print(f'Error: {response.status_code}')
-            print(response.text)
+            logger.error(f'Error: {response.status_code}')
+            logger.error(response.text)
         else:
             json_resp = response.json()
             logger.info(json_resp['dataset_name'])
