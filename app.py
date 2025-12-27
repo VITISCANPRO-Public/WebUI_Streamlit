@@ -154,6 +154,8 @@ def get_diseases() -> tuple:
             print(response.text)
         else:
             json_resp = response.json()
+            logger.info(json_resp['dataset_name'])
+            logger.info(json_resp['diseases'])
             return (json_resp['dataset_name'], dict(json_resp['diseases']))
 
 ##############################################################
