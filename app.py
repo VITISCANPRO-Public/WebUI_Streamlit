@@ -7,6 +7,13 @@ from PIL import Image, ExifTags
 from streamlit_folium import st_folium
 from dotenv import load_dotenv
 from datetime import datetime
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -17,18 +24,6 @@ API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000").replace('"'
 # var pour mock et debug
 MOCK = int(os.getenv("MOCK", "0"))
 DEBUG = int(os.getenv("DEBUG", "0"))
-
-# TODO la traduction devrait etre faite dans l'API solutions
-DISEASE_TRANSLATION = {
-    "anthracnose": "Anthracnose",
-    "brown_spot": "Tâche brune",
-    "downy_mildew": "Mildiou",
-    "mites": "Acariens",
-    "normal": "Pas de maladie",
-    "powdery_mildew": "Oïdium",
-    "shot_hole": "Coryneum",
-    "N/A":"N/A"
-}
 
 # TODO passer en id numérique si l'API solution évolue
 #OPTIONS_MODE = { 0 : "conventionnel", 1 : "bio" }
@@ -110,7 +105,10 @@ def call_api_diagnostic(uploaded_file):
             return response.json()
 
 def call_api_solutions(diagno_payload, debug=False):
-    """Appel API pour obtenir les traitements."""
+    """
+        Appel API pour obtenir les traitements en fonction
+        du diagnostic et d'infos complémentaires données par le viticulteur.
+    """
     if MOCK == 1:
         treatment = { "data" : { "cnn_label": "normal", "treatment_plan": {"dose_l_ha": 200, "area_m2": 0.5} } }
         return treatment
@@ -126,7 +124,38 @@ def call_api_solutions(diagno_payload, debug=False):
             print(response.text)
         else:
             return response.json()
-        
+
+def get_diseases() -> tuple:
+    '''
+    Récupération des maladies du modèle via l'API diagno.
+    Renvoi sous forme de tuple le nom du dataset et le dict des maladies avec traduction.
+
+    :return: un tuple avec (dataset_name="kaggle|inrae", dict_diseases)
+    :rtype: tuple
+    '''
+    if MOCK == 1:
+        diseases = {  "anthracnose": "Anthracnose",
+                        "brown_spot": "Tâche brune",
+                        "downy_mildew": "Mildiou",
+                        "mites": "Acariens",
+                        "normal": "Pas de maladie",
+                        "powdery_mildew": "Oïdium",
+                        "shot_hole": "Coryneum"
+                    }
+        dataset_name = "kaggle"
+        return (dataset_name, diseases)
+    else:
+        response = requests.post(f"{API_SOLUTIONS}/diseases",
+                                 headers=HEADERS,
+                                 timeout=60,
+                                 verify=False)
+        if response.status_code != 200:
+            print(f'Error: {response.status_code}')
+            print(response.text)
+        else:
+            json_resp = response.json()
+            return (json_resp['dataset_name'], dict(json_resp['diseases']))
+
 ##############################################################
 #----------------------- MAIN -------------------------------
 ##############################################################
@@ -143,6 +172,11 @@ def main():
         """,
         unsafe_allow_html=True
     )
+
+    # récupération du dictionnaire des maladies et du nom du dataset
+    DATASET_NAME, DISEASE_TRANSLATION = get_diseases()
+    logger.info(f"Dataset name : {DATASET_NAME}")
+    logger.info("Diseases dictionnary translation:", json.dumps(DISEASE_TRANSLATION, indent=4,ensure_ascii=True))
 
     # initialisation des variables de session
     for key in SESSION_VARS:
@@ -291,8 +325,6 @@ def main():
                     with st.expander("DEBUG Requête envoyée"):
                         st.code(json.dumps(diagno_payload, indent=2), language="json")
 
-                # TODO rajouter try/except
-                #if (cnn_label != "normal") or (cnn_label != "N/A"):
                 with st.spinner(text="Calcul du plan en cours..."):
                     try:
                         response = call_api_solutions(diagno_payload, debug)
@@ -303,8 +335,6 @@ def main():
                 if DEBUG:
                     with st.expander("DEBUG Réponse API solutions"):
                         st.code(json.dumps(response, indent=2), language="json")
-                #else:
-                #    st.write("Aucun plan d'action.")
     
     ########## SECTION RESULTATS SOLUTIONS / TRAITEMENTS ########
     if st.session_state.solutions:
@@ -326,7 +356,7 @@ def main():
                             treatment_product_list = tp['treatment_product']
                             #if treatment_product_list is list and len(treatment_product_list)>0:
                             for item in treatment_product_list:
-                                tp_key,tp_value = item.split(":")
+                                tp_key,tp_value = item.split(":", 1)
                                 st.markdown(f"- **{tp_key.strip()}** : {tp_value.strip()}")
 
                         if "dose_l_ha" in tp and tp['dose_l_ha']:
