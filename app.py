@@ -15,6 +15,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# disable warnings for API requests
+# import urllib3
+#urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
 load_dotenv()
 
 # API URL (à adapter selon déploiement)
@@ -154,6 +158,7 @@ def get_diseases() -> tuple:
             logger.error(response.text)
         else:
             json_resp = response.json()
+            logger.info(json_resp)
             logger.info(json_resp['dataset_name'])
             logger.info(json_resp['diseases'])
             return (json_resp['dataset_name'], dict(json_resp['diseases']))
@@ -162,6 +167,17 @@ def get_diseases() -> tuple:
 #----------------------- MAIN -------------------------------
 ##############################################################
 def main():
+    
+    logger.info(f"API_DIAGNO={API_DIAGNO}")
+    logger.info(f"API_SOLUTIONS={API_SOLUTIONS}")
+    logger.info(f"MOCK={MOCK}")
+    logger.info(f"DEBUG={DEBUG}")
+
+    # récupération du dictionnaire des maladies et du nom du dataset
+    DATASET_NAME, DISEASE_TRANSLATION = get_diseases()
+    logger.info(f"Dataset name : {DATASET_NAME}")
+    logger.info(f"Diseases dictionnary translation: {json.dumps(DISEASE_TRANSLATION, indent=4,ensure_ascii=True)}")
+
     # la modif du backgroundColor ne fonctionne pas dans .streamlit/config.toml
     # il faut forcer par CSS
     st.markdown(
@@ -174,11 +190,6 @@ def main():
         """,
         unsafe_allow_html=True
     )
-
-    # récupération du dictionnaire des maladies et du nom du dataset
-    DATASET_NAME, DISEASE_TRANSLATION = get_diseases()
-    logger.info(f"Dataset name : {DATASET_NAME}")
-    logger.info(f"Diseases dictionnary translation: {json.dumps(DISEASE_TRANSLATION, indent=4,ensure_ascii=True)}")
 
     # initialisation des variables de session
     for key in SESSION_VARS:
