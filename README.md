@@ -1,3 +1,13 @@
+---
+title: VITISCAN PRO
+emoji: 🍇
+colorFrom: green
+colorTo: purple
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
 # Vitiscan Pro — Web Interface
 
 Streamlit web application for grape leaf disease diagnosis and treatment planning.
