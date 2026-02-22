@@ -10,15 +10,17 @@ dependencies:
   - numpy
   - pandas
   - plotly
-  - ipykernel # ne pas installer jupyterlab qui est dans l'env base
+  - altair=4.2.2
+  - ipykernel 
   - notebook
-  - nbformat # pour notebook
+  - nbformat
   - glom
   - conda-bash-completion
   - streamlit
   - folium
   - pillow
   - streamlit-folium
+  - protobuf=3.20.3
   #- geopy
   #- boto3
   #- s3fs
