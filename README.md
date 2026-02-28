@@ -54,7 +54,7 @@ A farmer goes through three steps in a single session:
 
 ```
 WebUI-Streamlit/
-├── app.py                    # Main Streamlit application 
+├── app.py                    # Main Streamlit application
 ├── .streamlit/
 │   └── config.toml           # Streamlit theme
 ├── Dockerfile                # Container image
@@ -62,8 +62,15 @@ WebUI-Streamlit/
 ├── environment.yml           # Local Conda environment
 ├── .env.template             # Required environment variables
 ├── .gitattributes            # Git LFS for binary ML files
-├── .gitignore                # Python, secrets, IDE, OS artifacts
-└── README.md                 # This file
+├── .gitignore              
+├── README.md                 # This file
+├── tests/
+│   ├── Dockerfile            # Lightweight test image — runs pytest
+│   ├── requirements.txt      # Test dependencies only
+│   └── test_exif.py          # Unit tests for get_exif_data()
+└── .github/
+    └── workflows/
+        └── ci-cd.yml         # CI/CD — tests first, deploy only if tests pass
 ```
 
 ## Environment variables
@@ -139,6 +146,70 @@ Session state is used to persist data across Streamlit reruns within a session
 (uploaded file, diagnosis result, treatment plan, GPS coordinates).
 Uploading a new file triggers `reset_session()` which clears all state.
 
+## Testing
+
+The only function containing real business logic in this repo is `get_exif_data()` —
+it performs a DMS (degrees/minutes/seconds) → decimal degrees conversion.
+If this math is wrong, every parcel is plotted at the wrong location on the map.
+
+**What is tested:**
+
+| Test class | What it covers | Tests |
+|---|---|---|
+| `TestGetExifDataDefaults` | Image without EXIF, empty EXIF dict, corrupt file — must return safe defaults, never raise | 4 |
+| `TestDmsToDecimalConversion` | DMS → decimal math: Paris coordinates, whole degrees, edge cases (59'59"), equator | 5 |
+| `TestDateParsing` | EXIF date parsing `"2024:06:15"` → `"2024-06-15"`, malformed date, GPS + date together | 4 |
+
+**Why `streamlit` and `folium` are mocked:**
+
+`app.py` imports `streamlit` at the module level. Importing it outside of a running
+Streamlit server raises errors. Both `streamlit` and `streamlit_folium` are injected
+into `sys.modules` as `MagicMock` objects before the import, so the tests can run
+in a plain Python environment with no Streamlit server.
+
+**Run locally:**
+```bash
+PYTHONPATH=. pytest tests/ -v --tb=short
+```
+
+**Run tests with Docker (same as CI):**
+```bash
+docker build -t vitiscan-streamlit-tests -f tests/Dockerfile .
+docker run --rm vitiscan-streamlit-tests
+```
+
+## CI/CD pipeline
+
+Every push to `main` triggers a two-job sequential pipeline:
+
+```
+push to main
+     │
+     ▼
+Job 1: test
+  → docker build -f tests/Dockerfile
+  → docker run → pytest (15 tests)
+  → pass or fail
+     │
+     │  only if tests pass
+     ▼
+Job 2: deploy
+  → git push to HuggingFace Spaces
+  → HuggingFace builds Docker image
+  → Container starts → streamlit run app.py
+```
+
+The deploy job has `needs: [test]` — if any test fails, deployment is blocked.
+`workflow_dispatch` allows manual re-triggering from the GitHub UI without a code push.
+
+GitHub secrets and variables required (Settings → Secrets and variables → Actions):
+
+| Type | Name | Value |
+|---|---|---|
+| Secret | `HF_TOKEN` | Your HuggingFace write token |
+| Variable | `HF_USERNAME` | Your HuggingFace username |
+| Variable | `HF_SPACE_NAME` | The Space name |
+
 ## Requirements
 
 - Python 3.11
@@ -153,3 +224,4 @@ Uploading a new file triggers `reset_session()` which clears all state.
 - LinkedIn: [www.linkedin.com/in/mounia-tonazzini](www.linkedin.com/in/mounia-tonazzini)
 - GitHub: [github/Mounia-Agronomist-Datascientist](https://github.com/Mounia-Agronomist-Datascientist)
 - Email : mounia.tonazzini@gmail.com
+
