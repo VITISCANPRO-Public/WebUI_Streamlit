@@ -1,11 +1,13 @@
-python-dotenv
-requests
-numpy
-pandas
-plotly
-glom
-streamlit
-folium
-pillow
-streamlit-folium
-gunicorn
+# ─── Core UI ───
+streamlit==1.45.0
+
+# ─── Map rendering ────
+folium==0.19.5
+streamlit-folium==0.25.0
+
+# ─── Image processing ───
+pillow==11.2.1
+
+# ─── HTTP & environment ───
+requests==2.32.3
+python-dotenv==1.0.1

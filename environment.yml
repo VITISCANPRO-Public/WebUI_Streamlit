@@ -3,26 +3,12 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.12
+  - python=3.11
   - pip
-  - python-dotenv
-  - requests
-  - numpy
-  - pandas
-  - plotly
-  - altair=4.2.2
-  - ipykernel 
-  - notebook
-  - nbformat
-  - glom
-  - conda-bash-completion
-  - streamlit
-  - folium
-  - pillow
-  - streamlit-folium
-  - protobuf=3.20.3
-  #- geopy
-  #- boto3
-  #- s3fs
-  #- pip:
-  #  - -r file:env_streamlit_requirements.txt
+  - pip:
+    - streamlit==1.45.0
+    - folium==0.19.5
+    - streamlit-folium==0.25.0
+    - pillow==11.2.1
+    - requests==2.32.3
+    - python-dotenv==1.0.1
