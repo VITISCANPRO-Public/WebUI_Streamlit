@@ -1,32 +1,18 @@
 [theme]
-# Thème vert agriculture/environnement
+# Agriculture / nature color palette
 
-# Couleur principale - Vert forêt doux
+# Primary color — soft forest green
 primaryColor = "#5B8C5A"
 
-# Couleur de fond - Beige clair naturel
+# Background — light natural beige
 backgroundColor = "#F5F7F4"
 #backgroundColor = "#F8FAF8"
 
-# Couleur de fond secondaire - Vert très pâle
+# Secondary background — very pale green
 secondaryBackgroundColor = "#E8F3E8"
 
-# Couleur du texte - Gris anthracite
+# Text color — dark charcoal green
 textColor = "#2C3E2C"
 
-# Police de caractères
+# Font
 font = "sans serif"
-
-#[server]
-# Configuration du serveur
-#headless = true
-#port = 8501
-
-#[browser]
-# Collecte des statistiques d'usage
-#gatherUsageStats = false
-
-#[client]
-# Affichage de la barre d'outils
-#toolbarMode = "minimal"
-#showErrorDetails = true
