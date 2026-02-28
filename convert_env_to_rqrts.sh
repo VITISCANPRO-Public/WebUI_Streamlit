@@ -1,1 +1,0 @@
-cat env_vitiscan_streamlit.yml | grep -A 20 dependencies | grep -v dependencies | grep -v notebook | grep -v ipykernel | grep -v conda-bash-completion | grep -v nbformat | grep -v "python=" | grep -v pip | grep -v "  #" | sed -e "s/  - //g" > requirements.txt
