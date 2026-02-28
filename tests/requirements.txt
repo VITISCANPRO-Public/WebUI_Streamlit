@@ -1,0 +1,11 @@
+
+# Test runner
+pytest==8.3.5
+
+# Required to import app.py (mocked but must be importable)
+streamlit==1.45.0
+
+# Required by app.py
+pillow==11.2.1
+requests==2.32.3
+python-dotenv==1.0.1
