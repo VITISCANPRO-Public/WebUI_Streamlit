@@ -49,10 +49,6 @@ OPTIONS_SEVERITY = {
 
 MAP_STYLES = ["OpenStreetMap", "CartoDB Positron", "CartoDB Voyager"]
 
-HEADERS = {
-    'Accept-Encoding': 'gzip, deflate, br, zstd',
-    'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:145.0) Gecko/20100101 Firefox/145.0'
-}
 NOW = datetime.now().strftime("%Y-%m-%d")
 
 SESSION_VARS       = ['payload', 'solutions', 'diagnostic', 'img_date', 'img_long', 'img_lat', 'previous_file']
@@ -124,9 +120,7 @@ def call_api_diagnostic(uploaded_file) -> dict:
     files    = {"file": uploaded_file}
     response = requests.post(
         f"{API_DIAGNO}/diagno",
-        files=files,
-        headers=HEADERS,
-        verify=False
+        files=files
     )
     if response.status_code != 200:
         logger.error(f"Diagnostic API error {response.status_code}: {response.text}")
@@ -157,9 +151,7 @@ def call_api_solutions(payload: dict, debug: bool = False) -> dict:
         f"{API_SOLUTIONS}/solutions",
         params={'debug': str(debug)},
         json=payload,
-        headers=HEADERS,
-        timeout=60,
-        verify=False
+        timeout=60
     )
     if response.status_code != 200:
         logger.error(f"Solutions API error {response.status_code}: {response.text}")
@@ -189,9 +181,7 @@ def get_diseases() -> tuple:
     try:
         response = requests.get(
             f"{API_DIAGNO}/diseases",
-            headers=HEADERS,
-            timeout=60,
-            verify=False
+            timeout=60
         )
         response.raise_for_status()
         data = response.json()
