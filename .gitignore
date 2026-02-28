@@ -1,12 +1,34 @@
-# Python-generated files
+# ─── Python ───
 __pycache__/
-*.py[oc]
+*.py[cod]
+*.so
 build/
 dist/
 wheels/
 *.egg-info
-.env
-*.swp
 
-# Virtual environments
-.venv
+# ─── Environment & secrets ───
+.env
+.envrc
+
+# ─── Virtual environments ───
+.venv/
+venv/
+env/
+
+# ─── Test & coverage artifacts ───
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# ─── IDEs ───
+.vscode/
+.idea/
+
+# ─── OS ───
+.DS_Store
+Thumbs.db
+
+# ─── Misc ────
+*.swp
