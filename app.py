@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-API_DIAGNO   = os.getenv("API_DIAGNO",   "https://localhost:4000").replace('"', '')
+API_DIAGNO   = os.getenv("API_DIAGNO",   "https://localhost:8000").replace('"', '')
 API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000").replace('"', '')
 MOCK  = int(os.getenv("MOCK",  "0"))
 DEBUG = int(os.getenv("DEBUG", "0"))
@@ -85,8 +85,12 @@ def get_exif_data(image) -> tuple:
                 if decoded == "GPSInfo":
                     deg, min_, sec = value[2]
                     lat = int(deg) + int(min_) / 60 + int(sec) / 3600
+                    if value.get(1) == 'S':
+                        lat = -lat
                     deg, min_, sec = value[4]
                     lon = int(deg) + int(min_) / 60 + int(sec) / 3600
+                    if value.get(3) == 'W':
+                        lon = -lon
                 elif decoded == "DateTimeOriginal":
                     try:
                         dt   = datetime.strptime(value, "%Y:%m:%d %H:%M:%S")
@@ -120,7 +124,8 @@ def call_api_diagnostic(uploaded_file) -> dict:
     files    = {"file": uploaded_file}
     response = requests.post(
         f"{API_DIAGNO}/diagno",
-        files=files
+        files=files,
+        timeout=60
     )
     if response.status_code != 200:
         logger.error(f"Diagnostic API error {response.status_code}: {response.text}")
@@ -155,7 +160,7 @@ def call_api_solutions(payload: dict, debug: bool = False) -> dict:
     )
     if response.status_code != 200:
         logger.error(f"Solutions API error {response.status_code}: {response.text}")
-        return {}
+        return {'error': response.text, 'status_code': response.status_code}
     return response.json()
 
 
