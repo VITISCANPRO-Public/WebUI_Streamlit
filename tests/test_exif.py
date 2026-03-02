@@ -126,6 +126,22 @@ class TestGetExifDataDefaults:
         assert lon == 0.0
         assert lat == 0.0
         assert isinstance(date, str)
+    
+    def test_southern_hemisphere_negative_latitude(self):
+        """Buenos Aires: 34°36'12" S → -34.603333..."""
+        exif = {
+            TAG_GPS_INFO: {
+                1: 'S',
+                2: (34, 36, 12),
+                3: 'W', 
+                4: (58, 22, 54)
+            }
+        }
+        f = _make_image_file()
+        with _patch_exif(f, exif):
+            lon, lat, _ = get_exif_data(f)
+        assert lat == pytest.approx(-34.603333, abs=1e-4)
+        assert lon == pytest.approx(-58.381666, abs=1e-4)
 
 
 class TestDmsToDecimalConversion:
