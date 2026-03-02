@@ -221,7 +221,7 @@ GitHub secrets and variables required (Settings → Secrets and variables → Ac
 **Mounia Tonazzini** — Agronomist Engineer & Data Scientist and Data Engineer
 
 - HuggingFace: [huggingface.co/MouniaT](https://huggingface.co/MouniaT)
-- LinkedIn: [www.linkedin.com/in/mounia-tonazzini](www.linkedin.com/in/mounia-tonazzini)
+- LinkedIn: [linkedin.com/in/mounia-tonazzini](https://www.linkedin.com/in/mounia-tonazzini)
 - GitHub: [github/Mounia-Agronomist-Datascientist](https://github.com/Mounia-Agronomist-Datascientist)
 - Email : mounia.tonazzini@gmail.com
 
