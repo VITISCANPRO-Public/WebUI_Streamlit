@@ -224,6 +224,32 @@ def main():
     # Page config must be called first
     st.set_page_config(page_title="VitiScan Pro", page_icon="🍇")
 
+    # Expanders format
+    st.markdown("""
+        <style>
+        .stApp { background-color: #F5F7F4; }
+        
+        /* Expander color */
+        .streamlit-expanderHeader p {
+            font-size: 1.4rem !important;
+            font-weight: 700 !important;
+            color: #D6955B !important;
+        }
+        
+        /*  Expander hover color */
+        .streamlit-expanderHeader:hover p {
+            color: #000000 !important;
+        }
+        
+        /* Expender content */
+        .streamlit-expanderContent p,
+        .streamlit-expanderContent li {
+            font-size: 1rem !important;
+            color: #333 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # Custom background color
     st.markdown("""
         <style>
@@ -231,17 +257,6 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-        <style>
-        .stApp { background-color: #F5F7F4; }
-        
-        /* Bigger and bold expander titles*/
-        .streamlit-expanderHeader {
-            font-size: 1.2rem !important;
-            font-weight: 700 !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
 
     # Initialize all session state variables
     for key in SESSION_VARS:
@@ -397,7 +412,7 @@ def main():
                     st.markdown(f"**Severity** : {data.get('severity', '')}")
                     st.markdown(f"**Mode** : {data.get('mode', '')}")
                     st.markdown(f"**Season** : {data.get('season', '')}")
-                with st.expander("Diagnostic", expanded=True):
+                with st.expander("**Diagnostic**", expanded=True):
                     diagnostic_text = data.get("diagnostic", "No diagnostic information available.")
                     st.write(diagnostic_text)
 
