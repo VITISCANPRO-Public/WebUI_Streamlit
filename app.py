@@ -124,9 +124,18 @@ def call_api_diagnostic(uploaded_file) -> dict:
     # Reset file pointer to start (important!)
     uploaded_file.seek(0)
 
-    # Prepare multipart file with name and MIME type
+    file_bytes = uploaded_file.getvalue()
+    
+    # Détermine type per extension
+    if uploaded_file.name.lower().endswith(('.jpg', '.jpeg')):
+        mime_type = 'image/jpeg'
+    elif uploaded_file.name.lower().endswith('.png'):
+        mime_type = 'image/png'
+    else:
+        mime_type = 'image/jpeg'  # Fallback
+    
     files = {
-        "file": (uploaded_file.name, uploaded_file, uploaded_file.type or "image/jpeg")
+        "file": (uploaded_file.name, file_bytes, mime_type)
     }
     
     response = requests.post(
