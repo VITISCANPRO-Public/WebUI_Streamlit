@@ -121,15 +121,24 @@ def call_api_diagnostic(uploaded_file) -> dict:
             'model_version': 'resnet18_finetuning_v1'
         }
 
-    files    = {"file": uploaded_file}
+    # Reset file pointer to start (important!)
+    uploaded_file.seek(0)
+    
+    # Prepare multipart file with name and MIME type
+    files = {
+        "file": (uploaded_file.name, uploaded_file, uploaded_file.type)
+    }
+    
     response = requests.post(
         f"{API_DIAGNO}/diagno",
         files=files,
         timeout=60
     )
+    
     if response.status_code != 200:
         logger.error(f"Diagnostic API error {response.status_code}: {response.text}")
         return {'error': response.text, 'status_code': response.status_code}
+    
     return response.json()
 
 
