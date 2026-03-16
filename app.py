@@ -231,6 +231,18 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
+    st.markdown("""
+        <style>
+        .stApp { background-color: #F5F7F4; }
+        
+        /* Bigger and bold expander titles*/
+        .streamlit-expanderHeader {
+            font-size: 1.2rem !important;
+            font-weight: 700 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
     # Initialize all session state variables
     for key in SESSION_VARS:
         if key not in st.session_state:
@@ -380,13 +392,16 @@ def main():
             if not data:
                 st.error("No treatment data received.")
             else:
-                with st.expander("Summary", expanded=True):
+                with st.expander("**Summary**", expanded=True):
                     st.markdown(f"**Detected disease** : {DISEASE_LABELS.get(data.get('cnn_label', 'N/A'), 'N/A')}")
                     st.markdown(f"**Severity** : {data.get('severity', '')}")
                     st.markdown(f"**Mode** : {data.get('mode', '')}")
                     st.markdown(f"**Season** : {data.get('season', '')}")
+                with st.expander("Diagnostic", expanded=True):
+                    diagnostic_text = data.get("diagnostic", "No diagnostic information available.")
+                    st.write(diagnostic_text)
 
-                with st.expander("Treatment actions", expanded=True):
+                with st.expander("**Treatment actions**", expanded=True):
                     tp = data.get("treatment_plan", {})
                     if tp:
                         for item in tp.get("treatment_product", []):
@@ -400,12 +415,12 @@ def main():
                         if action:
                             st.markdown(f"- {action}")
 
-                with st.expander("Preventive measures", expanded=True):
+                with st.expander("**Preventive measures**", expanded=True):
                     for action in data.get("preventive_actions", []):
                         if action:
                             st.markdown(f"- {action}")
 
-                with st.expander("Warnings", expanded=True):
+                with st.expander("**Warnings**", expanded=True):
                     for w in data.get("warnings", []):
                         if w:
                             st.markdown(f"- {w}")
