@@ -123,10 +123,10 @@ def call_api_diagnostic(uploaded_file) -> dict:
 
     # Reset file pointer to start (important!)
     uploaded_file.seek(0)
-    
+
     # Prepare multipart file with name and MIME type
     files = {
-        "file": (uploaded_file.name, uploaded_file, uploaded_file.type)
+        "file": (uploaded_file.name, uploaded_file, uploaded_file.type or "image/jpeg")
     }
     
     response = requests.post(
