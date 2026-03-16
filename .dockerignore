@@ -1,0 +1,27 @@
+# Git
+.git/
+.github/
+.gitattributes
+.gitignore
+
+# Secrets
+.env
+.envrc
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+
+# Tests 
+tests/
+conftest.py
+
+
+# Conda environments 
+environment.yml
+
