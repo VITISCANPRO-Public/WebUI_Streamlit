@@ -18,10 +18,14 @@ Thumbs.db
 
 
 # Tests 
-tests/
-conftest.py
+# tests/
+# conftest.py
 
 
 # Conda environments 
 environment.yml
 
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
