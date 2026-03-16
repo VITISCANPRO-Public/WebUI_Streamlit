@@ -8,10 +8,11 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+COPY requirements.txt ./
+COPY tests/requirements.txt ./tests/
 # Install test dependencies only — much lighter than the full app image
-COPY tests/requirements.txt ./
 RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+    pip install -r tests/requirements.txt
 
 # Copy source files required to import app.py
 COPY app.py ./
