@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 
-API_DIAGNO   = os.getenv("API_DIAGNO",   "https://localhost:8000").replace('"', '')
-API_SOLUTIONS = os.getenv("API_SOLUTIONS", "https://localhost:9000").replace('"', '')
+API_DIAGNO   = os.getenv("API_DIAGNO","https://mouniat-vitiscanpro-diagno-api.hf.space").replace('"', '')
+API_SOLUTIONS = os.getenv("API_SOLUTIONS","https://mouniat-vitiscanpro-solution-api.hf.space").replace('"', '')
 MOCK  = int(os.getenv("MOCK",  "0"))
 DEBUG = int(os.getenv("DEBUG", "0"))
 
