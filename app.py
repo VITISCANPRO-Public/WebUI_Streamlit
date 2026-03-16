@@ -250,13 +250,6 @@ def main():
         </style>
     """, unsafe_allow_html=True)
 
-    # Custom background color
-    st.markdown("""
-        <style>
-        .stApp { background-color: #F5F7F4; }
-        </style>
-    """, unsafe_allow_html=True)
-
 
     # Initialize all session state variables
     for key in SESSION_VARS:
